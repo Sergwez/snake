@@ -1,0 +1,124 @@
+<!DOCTYPE HTML>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>snake </title>
+  <style type="text/css">
+ canvas {  border:solid 1px; float:none;}
+ .content {left:50%; margin-left:-240px;display:block; position:relative; width:480px;}
+ 
+  
+  </style>
+ </head>
+ <body>
+	<div class="content">
+		<b id="score"> Ваш счет: 0</b>
+		<canvas height='544' width='480' id='canva'>Пример</canvas>
+	</div>
+	<script>
+	window.onload = function() {
+	(function(){"use strict";
+		let canva = document.getElementById("canva");
+		let context = canva.getContext('2d');
+		
+		//Изменяемые переменные
+		let box = 32; //размер бокса
+		let setInrvl = 200; //Интервал обновления
+		let hTable = 544; //ширина доски, должна быть равна канвасу
+		let wTable = 480; //высота доски, должна быть равна канвасу
+		
+		//Расчитываемые переменные
+		let hBox = 544/box;// высота доски в боксах
+		let wBox = 480/box;//ширина доски в боксах
+		let xCenter = box*Math.floor(wBox/2); //центрируем по ширине
+		let yCenter = box*Math.floor(hBox/2); // центрируем по высоте
+		let moveX = 0; //Движение по оси Х
+		let moveY = 0; //Движение по оси У
+		let score = 1; //Счет и длинна змейки
+		
+		 
+		 
+		//прикрепляем значения при нажатии клавиши
+		addEventListener("keydown", function(event) {
+			if (event.keyCode == 37&&moveX==0){
+				moveX = -box;
+				moveY = 0;
+			}
+			else if (event.keyCode == 38&&moveY==0){
+				moveY = -box;
+				moveX = 0;
+			}
+			else if (event.keyCode == 39&&moveX==0){
+				moveX = box;
+				moveY = 0;
+			}
+			else if(event.keyCode == 40&&moveY==0){
+				moveY = box;
+				moveX = 0;
+			}
+		});
+		//массивы для змейки, первый для всей змейки, второй и третий с координатами для создания головы
+		let bodySnake = [];
+		let bodySnakeX = [];
+		let bodySnakeY = [];
+		//let xEat = 0;
+		//let yEat = 0;
+		let xEat = Math.floor((Math.random() * wBox)) * box;
+		let yEat = Math.floor((Math.random() * hBox)) * box;
+		//начало анимации
+		let setIntervalId = setInterval(msec, setInrvl);
+		function msec() {
+			//создаем фон в виде шахматной доски
+			context.fillStyle = '#eeeeee';
+			context.fillRect(0, 0, box*wBox, box*hBox);
+			for (let i = 0; i < wBox; i += 2)
+				for (let j = 0; j < hBox; j += 2) {
+					context.clearRect(i * box, j * box, box, box);
+					context.clearRect((i + 1) * box, (j + 1) * box, box, box);
+				}
+		//Делаем тело змейки, где длинна массива равна количеству блоков в змейке
+		xCenter = xCenter + moveX;
+		yCenter = yCenter + moveY;
+		bodySnakeX.unshift(xCenter);
+		bodySnakeY.unshift(yCenter);
+		bodySnake.length = score;
+		context.fillStyle = '#000000';
+		for (let i = 0; i < score; i++) {
+			bodySnake[i];
+			context.fillRect(bodySnakeX[i], bodySnakeY[i], box, box);
+			document.getElementById("score").innerHTML="Ваш счет: "+score;
+		}
+		//Создаем еду
+		if(xEat==bodySnakeX[0]&&yEat==bodySnakeY[0]){
+			score +=1;
+			xEat = Math.floor((Math.random() * wBox)) * box;
+			yEat = Math.floor((Math.random() * hBox)) * box;
+		}
+		context.fillStyle = '#bb0000';
+		context.fillRect(xEat, yEat, box, box);
+		
+		//Чеки
+		//Если голова выходит за пределы поля, то останавливаем игру
+		if (bodySnakeX[0]<0||bodySnakeY[0]<0||bodySnakeX[0]>wTable-1*box|| bodySnakeY[0]>hTable-1*box){
+			clearInterval(setIntervalId);
+			alert("Змейка встретила непреодолимое препятствие в виде стены. Игра закончена. Ваш счет:" +score);	
+		}
+		// если голова змейки заходит на свое тело, то останавливаем игру
+		function checkEatHimself(){
+			for(let i = 1; i < bodySnake.length; i++) {
+				if(bodySnakeX[0] == bodySnakeX[i] && bodySnakeY[0] == bodySnakeY[i]){
+					clearInterval(setIntervalId);
+					alert("Змейка начала есть саму себя. Игра закончена. Ваш счет:" +score);
+				}
+			}
+		};
+		checkEatHimself();
+		}
+		setIntervalId;
+		
+	 })();
+};
+
+	</script>
+  </body>
+ </html>
